@@ -211,105 +211,114 @@
                 </div>
             </div>
         </div>
-        <script src=""></script>
+<!--         <script>
+  (function() {
+    const noop = function() {};
+    const methods = ['log','warn','error','info','debug','trace','dir','table','group','groupEnd','time','timeEnd'];
+    methods.forEach(m => {
+      try { console[m] = noop; } catch(e) {}
+    });
+    // Also block devtools via timing detection
+    let devtools = false;
+    const threshold = 160;
+    setInterval(() => {
+      const before = performance.now();
+      debugger; // pauses in devtools, takes time — detected
+      if (performance.now() - before > threshold) {
+        // Devtools is open — scramble or redirect
+        document.body.innerHTML = '';
+        window.location.href = 'about:blank';
+      }
+    }, 1000);
+  })();
+</script> -->
+        
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
             const countDownDate = new Date("July 29, 2026 00:00:00").getTime();
 
-const x = setInterval(function () {
-  const now = new Date().getTime();
-  const distance = countDownDate - now;
+            const x = setInterval(function () {
+                  const now = new Date().getTime();
+                  const distance = countDownDate - now;
 
-  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-  document.getElementById("days").innerHTML = days.toString().padStart(2, "0");
-  document.getElementById("hours").innerHTML = hours.toString().padStart(2, "0");
-  document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, "0");
-  document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, "0");
+                  document.getElementById("days").innerHTML = days.toString().padStart(2, "0");
+                  document.getElementById("hours").innerHTML = hours.toString().padStart(2, "0");
+                  document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, "0");
+                  document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, "0");
 
-  if (distance < 0) {
-    clearInterval(x);
-    document.getElementById("countdown").innerHTML =
-      "<div class='col-12 text-center text-accent-green fs-4'>We have launched!</div>";
-  }
-}, 1000);
+                  if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countdown").innerHTML =
+                    "<div class='col-12 text-center text-accent-green fs-4'>We have launched!</div>";
+                }
+            }, 1000);
 
-document.getElementById("notifyForm").addEventListener("submit", function (e) {
-  e.preventDefault();
+            document.getElementById("notifyForm").addEventListener("submit", function (e) {
+              e.preventDefault();
 
-  const form = this;
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const emailInput = form.querySelector('input[type="email"]');
-  const phoneInput = form.querySelector('input[type="tel"]');
+              const form = this;
+              const submitBtn = form.querySelector('button[type="submit"]');
+              const emailInput = form.querySelector('input[type="email"]');
+              const phoneInput = form.querySelector('input[type="tel"]');
 
-  const toastElement = document.getElementById("statusToast");
-  const toastMessage = document.getElementById("toastMessage");
-  const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+              const toastElement = document.getElementById("statusToast");
+              const toastMessage = document.getElementById("toastMessage");
+              const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
 
-  const originalBtnText = submitBtn.innerHTML;
+              const originalBtnText = submitBtn.innerHTML;
 
-  // Helper to reset the button state
-  function resetBtn() {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalBtnText;
-  }
+              function resetBtn() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
 
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = "Verifying...";
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "Verifying...";
 
-  grecaptcha
-    .ready(function () {
-      grecaptcha
-        .execute("6LdTOkotAAAAAE59Fghhc6gW3FZfNxNm0UQpoesG", { action: "submit" })
-        .then(function (token) {
-          const formData = new URLSearchParams();
-          formData.append("email", emailInput.value);
-          formData.append("phone", phoneInput.value);
-          formData.append("recaptchaToken", token);
+            grecaptcha
+            .ready(function () {
+              grecaptcha
+              .execute("6LdTOkotAAAAAE59Fghhc6gW3FZfNxNm0UQpoesG", { action: "submit" })
+              .then(function (token) {
+                  const formData = new URLSearchParams();
+                  formData.append("email", emailInput.value);
+                  formData.append("phone", phoneInput.value);
+                  formData.append("recaptchaToken", token);
 
-          const scriptURL =
-            "https://script.google.com/macros/s/AKfycbwWQ1TyFejDxR-DHOPTRivsEu2_0dzgzE3eqXXZJT3SGXjtcC8UUcHEj3yyURib12CglQ/exec";
 
-          submitBtn.innerHTML = "Adding to list...";
+                  submitBtn.innerHTML = "Adding to list...";
 
-          // NOTE: mode:'no-cors' returns an opaque response — status is always 0
-          // and body is always empty. We treat the fetch completing without a
-          // network error as success.
-          fetch(scriptURL, {
-            method: "POST",
-            mode: "no-cors",
-            body: formData,
-          })
-            .then(function () {
-              // Opaque response — assume success if no network error was thrown
-              toastMessage.textContent = "Thank you! You have been added to the waitlist.";
-              toastElement.className = "toast align-items-center border-0 bg-accent-green";
-              toast.show();
-              form.reset();
-            })
-            .catch(function (err) {
-              console.error("Fetch error:", err);
-              toastMessage.textContent = "Something went wrong. Please try again.";
-              toastElement.className = "toast align-items-center border-0 bg-danger";
-              toast.show();
-            })
-            .finally(function () {
-              resetBtn();
-            });
-        })
-        .catch(function (err) {
-          console.error("reCAPTCHA error:", err);
-          toastMessage.textContent = "reCAPTCHA verification failed. Please try again.";
-          toastElement.className = "toast align-items-center border-0 bg-danger";
-          toast.show();
-          resetBtn();
-        });
-    });
+                  fetch('/api/submit', {   
+                    method: 'POST',
+                    body: formData
+                })
+                  .then(res => res.json())  
+                  .then(data => {
+                      if (data.result === 'success') {
+                        toastMessage.textContent = 'Thank you! You have been added to the waitlist.';
+                        toastElement.className = 'toast align-items-center border-0 bg-accent-green';
+                        toast.show();
+                        form.reset();
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                  .catch(err => {
+                      toastMessage.textContent = err.message || 'Something went wrong. Please try again.';
+                      toastElement.className = 'toast align-items-center border-0 bg-danger';
+                      toast.show();
+                  })
+                  .finally(() => resetBtn());
+              });
+          });
+
 });
-        </script>
-    </body>
-    </html>
+      </script>
+  </body>
+  </html>

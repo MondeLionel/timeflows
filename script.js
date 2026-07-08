@@ -35,12 +35,11 @@
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = 'Verifying...';
 
-    // Execute reCAPTCHA
+
                 grecaptcha.ready(function() {
-        // PASTE YOUR SITE KEY HERE AS WELL
+
                     grecaptcha.execute('6LdTOkotAAAAAE59Fghhc6gW3FZfNxNm0UQpoesG', {action: 'submit'}).then(function(token) {
 
-            // Now prepare the data, including the new token
                         const formData = new URLSearchParams();
                         formData.append('email', emailInput.value);
                         formData.append('phone', phoneInput.value);
@@ -75,7 +74,7 @@
                 }
 
                 try {
-                    // Try parsing as JSON first
+
                     const data = JSON.parse(res.text);
                     if (data.result === 'success') {
                         toastMessage.textContent = 'Thank you! You have been added to the waitlist.';
@@ -86,18 +85,18 @@
                         throw new Error(data.message || 'The server rejected your submission.');
                     }
                 } catch (jsonError) {
-                    // If it's plain text 'Success' (from earlier plain text code versions)
+
                     if (res.text.trim() === 'Success') {
                         toastMessage.textContent = 'Thank you! You have been added to the waitlist.';
                         toastElement.className = 'toast align-items-center border-0 bg-accent-green'; 
                         toast.show();
                         form.reset();
                     } else {
-                        // Fallback for any plain text error or Google login redirects
+
                         throw new Error(res.text);
                     }
                 }
-                        
+
             });
-            });
-            });
+        });
+    });
